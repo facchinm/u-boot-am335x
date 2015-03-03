@@ -29,6 +29,11 @@ struct am335x_baseboard_id {
 	char mac_addr[HDR_NO_OF_MAC_ADDR][HDR_ETH_ALEN];
 };
 
+static inline int board_is_maserati(struct am335x_baseboard_id *header)
+{
+	return !strncmp(header->name, "MASERATI", HDR_NAME_LEN);
+}
+
 static inline int board_is_bone(struct am335x_baseboard_id *header)
 {
 	return !strncmp(header->name, "A335BONE", HDR_NAME_LEN);

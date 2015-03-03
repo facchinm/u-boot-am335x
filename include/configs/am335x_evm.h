@@ -78,11 +78,11 @@
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	DEFAULT_LINUX_BOOT_ENV \
 	"boot_fdt=try\0" \
-	"bootpart=0:2\0" \
+	"bootpart=0:3\0" \
 	"bootdir=/boot\0" \
 	"bootfile=zImage\0" \
 	"fdtfile=undefined\0" \
-	"console=ttyO0,115200n8\0" \
+	"console=ttyO1,115200n8\0" \
 	"partitions=" \
 		"uuid_disk=${uuid_gpt_disk};" \
 		"name=rootfs,start=2MiB,size=-,uuid=${uuid_gpt_rootfs}\0" \
@@ -176,6 +176,8 @@
 			"setenv fdtfile am335x-boneblack.dtb; fi; " \
 		"if test $board_name = A33515BB; then " \
 			"setenv fdtfile am335x-evm.dtb; fi; " \
+		"if test $board_name = MASERATI; then " \
+			"setenv fdtfile maserati.dtb; fi; " \
 		"if test $board_name = A335X_SK; then " \
 			"setenv fdtfile am335x-evmsk.dtb; fi; " \
 		"if test $fdtfile = undefined; then " \

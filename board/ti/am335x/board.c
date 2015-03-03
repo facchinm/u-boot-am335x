@@ -45,6 +45,17 @@ static struct ctrl_dev *cdev = (struct ctrl_dev *)CTRL_DEVICE_BASE;
  */
 static int read_eeprom(struct am335x_baseboard_id *header)
 {
+#ifdef CONFIG_MASERATI
+	/* Maserati does not include a baseboard eeprom
+	 * otherwise, there is lots of compatibility with
+	 * other AM335x boards, so keep the infrastructure
+	 * as common as possible.
+	 */
+	header->magic = 0xEE3355AA;
+	strncpy(header->name, "MASERATI", 8);
+	strncpy(header->version, "00A1", 4);
+	strncpy(header->serial, "000000000000", 12);
+#else
 	/* Check if baseboard eeprom is available */
 	if (i2c_probe(CONFIG_SYS_I2C_EEPROM_ADDR)) {
 		puts("Could not probe the EEPROM; something fundamentally "
@@ -78,7 +89,7 @@ static int read_eeprom(struct am335x_baseboard_id *header)
 			return -EINVAL;
 		}
 	}
-
+#endif
 	return 0;
 }
 
@@ -120,6 +131,13 @@ static const struct ddr_data ddr3_beagleblack_data = {
 	.datawrsratio0 = MT41K256M16HA125E_PHY_WR_DATA,
 };
 
+static const struct ddr_data ddr3_maserati_data = {
+	.datardsratio0 = MASERATI_A1_RD_DQS,
+	.datawdsratio0 = MASERATI_A1_WR_DQS,
+	.datafwsratio0 = MASERATI_A1_PHY_FIFO_WE,
+	.datawrsratio0 = MASERATI_A1_PHY_WR_DATA,
+};
+
 static const struct ddr_data ddr3_evm_data = {
 	.datardsratio0 = MT41J512M8RH125_RD_DQS,
 	.datawdsratio0 = MT41J512M8RH125_WR_DQS,
@@ -147,6 +165,17 @@ static const struct cmd_control ddr3_beagleblack_cmd_ctrl_data = {
 
 	.cmd2csratio = MT41K256M16HA125E_RATIO,
 	.cmd2iclkout = MT41K256M16HA125E_INVERT_CLKOUT,
+};
+
+static const struct cmd_control ddr3_maserati_cmd_ctrl_data = {
+	.cmd0csratio = MASERATI_A1_RATIO,
+	.cmd0iclkout = MASERATI_A1_INVERT_CLKOUT,
+
+	.cmd1csratio = MASERATI_A1_RATIO,
+	.cmd1iclkout = MASERATI_A1_INVERT_CLKOUT,
+
+	.cmd2csratio = MASERATI_A1_RATIO,
+	.cmd2iclkout = MASERATI_A1_INVERT_CLKOUT,
 };
 
 static const struct cmd_control ddr3_evm_cmd_ctrl_data = {
@@ -179,6 +208,16 @@ static struct emif_regs ddr3_beagleblack_emif_reg_data = {
 	.sdram_tim3 = MT41K256M16HA125E_EMIF_TIM3,
 	.zq_config = MT41K256M16HA125E_ZQ_CFG,
 	.emif_ddr_phy_ctlr_1 = MT41K256M16HA125E_EMIF_READ_LATENCY,
+};
+
+static struct emif_regs ddr3_maserati_emif_reg_data = {
+	.sdram_config = MASERATI_A1_EMIF_SDCFG,
+	.ref_ctrl = MASERATI_A1_EMIF_SDREF,
+	.sdram_tim1 = MASERATI_A1_EMIF_TIM1,
+	.sdram_tim2 = MASERATI_A1_EMIF_TIM2,
+	.sdram_tim3 = MASERATI_A1_EMIF_TIM3,
+	.zq_config = MASERATI_A1_ZQ_CFG,
+	.emif_ddr_phy_ctlr_1 = MASERATI_A1_EMIF_READ_LATENCY,
 };
 
 static struct emif_regs ddr3_evm_emif_reg_data = {
@@ -421,12 +460,20 @@ const struct ctrl_ioregs ioregs_evmsk = {
 	.dt1ioctl		= MT41J128MJT125_IOCTRL_VALUE,
 };
 
+const struct ctrl_ioregs ioregs_maserati = {
+	.cm0ioctl		= MASERATI_A1_IOCTRL_VALUE,
+	.cm1ioctl		= MASERATI_A1_IOCTRL_VALUE,
+	.cm2ioctl		= MASERATI_A1_IOCTRL_VALUE,
+	.dt0ioctl		= MASERATI_A1_IOCTRL_VALUE,
+	.dt1ioctl		= MASERATI_A1_IOCTRL_VALUE,
+};
+
 const struct ctrl_ioregs ioregs_bonelt = {
-	.cm0ioctl		= MT41K256M16HA125E_IOCTRL_VALUE,
-	.cm1ioctl		= MT41K256M16HA125E_IOCTRL_VALUE,
-	.cm2ioctl		= MT41K256M16HA125E_IOCTRL_VALUE,
-	.dt0ioctl		= MT41K256M16HA125E_IOCTRL_VALUE,
-	.dt1ioctl		= MT41K256M16HA125E_IOCTRL_VALUE,
+        .cm0ioctl               = MT41K256M16HA125E_IOCTRL_VALUE,
+        .cm1ioctl               = MT41K256M16HA125E_IOCTRL_VALUE,
+        .cm2ioctl               = MT41K256M16HA125E_IOCTRL_VALUE,
+        .dt0ioctl               = MT41K256M16HA125E_IOCTRL_VALUE,
+        .dt1ioctl               = MT41K256M16HA125E_IOCTRL_VALUE,
 };
 
 const struct ctrl_ioregs ioregs_evm15 = {
@@ -464,6 +511,11 @@ void sdram_init(void)
 	if (board_is_evm_sk(&header))
 		config_ddr(303, &ioregs_evmsk, &ddr3_data,
 			   &ddr3_cmd_ctrl_data, &ddr3_emif_reg_data, 0);
+	else if (board_is_maserati(&header))
+		config_ddr(400, &ioregs_maserati,
+			   &ddr3_maserati_data,
+			   &ddr3_maserati_cmd_ctrl_data,
+			   &ddr3_maserati_emif_reg_data, 0);
 	else if (board_is_bone_lt(&header))
 		config_ddr(400, &ioregs_bonelt,
 			   &ddr3_beagleblack_data,
@@ -622,7 +674,7 @@ int board_eth_init(bd_t *bis)
 		puts("Could not get board ID.\n");
 
 	if (board_is_bone(&header) || board_is_bone_lt(&header) ||
-	    board_is_idk(&header)) {
+	    board_is_idk(&header) ||  board_is_maserati(&header)) {
 		writel(MII_MODE_ENABLE, &cdev->miisel);
 		cpsw_slaves[0].phy_if = cpsw_slaves[1].phy_if =
 				PHY_INTERFACE_MODE_MII;
