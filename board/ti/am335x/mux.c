@@ -34,8 +34,8 @@ static struct module_pin_mux uart1_pin_mux[] = {
 };
 
 static struct module_pin_mux uart2_pin_mux[] = {
-	{OFFSET(spi0_sclk), (MODE(1) | PULLUP_EN | RXACTIVE)},	/* UART2_RXD */
-	{OFFSET(spi0_d0), (MODE(1) | PULLUDEN)},		/* UART2_TXD */
+	{OFFSET(mii1_txclk), (MODE(1) | PULLUP_EN | RXACTIVE)},	/* UART2_RXD */
+	{OFFSET(mii1_rxclk), (MODE(1) | PULLUDEN)},		/* UART2_TXD */
 	{-1},
 };
 
@@ -55,6 +55,20 @@ static struct module_pin_mux uart5_pin_mux[] = {
 	{OFFSET(lcd_data9), (MODE(4) | PULLUP_EN | RXACTIVE)},	/* UART5_RXD */
 	{OFFSET(lcd_data8), (MODE(4) | PULLUDEN)},		/* UART5_TXD */
 	{-1},
+};
+
+static struct module_pin_mux rmii1_pin_mux[] = {
+        {OFFSET(mii1_rxerr), MODE(1) | RXACTIVE},       /* RMII1_RXERR */
+        {OFFSET(mii1_txen), MODE(1)},                   /* RMII1_TCTL */
+        {OFFSET(mii1_crs), MODE(1) | RXACTIVE},         /* RMII1_RCTL */
+        {OFFSET(mii1_txd1), MODE(1)},                   /* RMII1_TD1 */
+        {OFFSET(mii1_txd0), MODE(1)},                   /* RMII1_TD0 */
+        {OFFSET(mii1_rxd1), MODE(1) | RXACTIVE},        /* RMII1_RD1 */
+        {OFFSET(mii1_rxd0), MODE(1) | RXACTIVE},        /* RMII1_RD0 */
+        {OFFSET(rmii1_refclk), MODE(0) | RXACTIVE},     /* RMII1_REFCLK*/
+        {OFFSET(mdio_data), MODE(0) | RXACTIVE | PULLUP_EN},/* MDIO_DATA */
+        {OFFSET(mdio_clk), MODE(0) | PULLUP_EN},        /* MDIO_CLK */
+        {-1},
 };
 
 static struct module_pin_mux mmc0_pin_mux[] = {
@@ -371,6 +385,10 @@ void enable_board_pin_mux(struct am335x_baseboard_id *header)
 #else
 		configure_module_pin_mux(mmc1_pin_mux);
 #endif
+        } else if (board_is_maserati(header)) {
+		configure_module_pin_mux(i2c1_pin_mux);
+                configure_module_pin_mux(rmii1_pin_mux);
+                configure_module_pin_mux(mmc0_pin_mux_sk_evm);
 	} else {
 		puts("Unknown board, cannot configure pinmux.");
 		hang();

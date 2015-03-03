@@ -414,6 +414,8 @@ const struct dpll_params *get_dpll_ddr_params(void)
 		return &dpll_ddr_evm_sk;
 	else if (board_is_bone_lt(&header))
 		return &dpll_ddr_bone_black;
+        else if (board_is_maserati(&header))
+                return &dpll_ddr_bone_black;
 	else if (board_is_evm_15_or_later(&header))
 		return &dpll_ddr_evm_sk;
 	else
