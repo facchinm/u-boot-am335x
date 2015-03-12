@@ -177,7 +177,7 @@
 		"if test $board_name = A33515BB; then " \
 			"setenv fdtfile am335x-evm.dtb; fi; " \
 		"if test $board_name = MASERATI; then " \
-			"setenv fdtfile maserati.dtb; fi; " \
+			"setenv fdtfile arduino-tre.dtb; fi; " \
 		"if test $board_name = A335X_SK; then " \
 			"setenv fdtfile am335x-evmsk.dtb; fi; " \
 		"if test $fdtfile = undefined; then " \
