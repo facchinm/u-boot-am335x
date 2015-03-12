@@ -62,7 +62,8 @@ static inline int board_is_bone(void)
 
 static inline int board_is_bone_lt(void)
 {
-	return !strncmp(header.name, "A335BNLT", HDR_NAME_LEN);
+	return 1;
+	//return !strncmp(header.name, "A335BNLT", HDR_NAME_LEN);
 }
 
 static inline int board_is_evm_sk(void)
@@ -661,6 +662,7 @@ void s_init(void)
 		puts("Could not get board ID.\n");
 #endif
 
+#if 0
 	/* Check if baseboard eeprom is available */
 	if (i2c_probe(CONFIG_SYS_I2C_EEPROM_ADDR)) {
 		puts("Could not probe the EEPROM; something fundamentally "
@@ -692,6 +694,8 @@ void s_init(void)
 			hang();
 		}
 	}
+#endif
+	strncpy(header.name, "A335BNLT", HDR_NAME_LEN);
 
 	enable_board_pin_mux(&header);
 	if (!strncmp("A335X_SK", header.name, HDR_NAME_LEN)) {
