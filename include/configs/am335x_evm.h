@@ -82,13 +82,13 @@
 	"bootdir=/boot\0" \
 	"bootfile=zImage\0" \
 	"fdtfile=undefined\0" \
-	"console=ttyO1,115200n8\0" \
+	"console=ttyO0,115200n8\0" \
 	"partitions=" \
 		"uuid_disk=${uuid_gpt_disk};" \
 		"name=rootfs,start=2MiB,size=-,uuid=${uuid_gpt_rootfs}\0" \
-	"optargs=\0" \
+	"optargs=earlyprintk=serial vram=50M\0" \
 	"mmcdev=0\0" \
-	"mmcroot=/dev/mmcblk0p2 ro\0" \
+	"mmcroot=/dev/mmcblk0p3\0" \
 	"mmcrootfstype=ext4 rootwait\0" \
 	"rootpath=/export/rootfs\0" \
 	"nfsopts=nolock\0" \
