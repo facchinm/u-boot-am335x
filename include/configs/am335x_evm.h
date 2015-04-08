@@ -31,6 +31,7 @@
 # endif
 #endif
 
+#define CONFIG_SUPPORT_RAW_INITRD
 #define CONFIG_SYS_BOOTM_LEN		(16 << 20)
 
 #define MACH_TYPE_TIAM335EVM		3589	/* Until the next sync */
